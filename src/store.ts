@@ -20,7 +20,7 @@ export interface Drain {
 }
 
 export type ViewMode = '2D' | '3D';
-export type Tool = 'SELECT' | 'DRAW_ROOF' | 'ADD_OBSTACLE' | 'ADD_DRAIN' | 'DELETE';
+export type Tool = 'SELECT' | 'DRAW_ROOF' | 'ADD_DRAIN' | 'DRAW_OBSTACLE' | 'DELETE';
 
 export interface AppState {
   // Data

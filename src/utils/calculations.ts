@@ -54,11 +54,15 @@ export const calculateEstimates = (
 
   const effectiveRate = baseRate * heightFactor * tileFactor;
   
+  const totalCost = netArea * effectiveRate;
+
   return {
     roofArea,
     obstaclesArea,
     netArea,
     effectiveRate,
-    totalCost: netArea * effectiveRate
+    totalCost,
+    totalArea: netArea, // Rename or alias for consistency with Sidebar
+    tileCount: Math.ceil((netArea / (tileSize * tileSize)) * 1.05) // Dynamic count + 5% waste
   };
 };

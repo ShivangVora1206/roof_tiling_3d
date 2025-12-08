@@ -64,14 +64,16 @@ export const Editor2D: React.FC = () => {
         }
       }
       setPoints([...points, pos]);
-    } else if (activeTool === 'ADD_OBSTACLE') {
-      addObstacle({
-        id: Math.random().toString(36).substr(2, 9),
-        x: pos.x,
-        y: pos.y,
-        width: 1, // Default 1x1m
-        height: 1
-      });
+    } else if (activeTool === 'DRAW_OBSTACLE') {
+      // Add standard chimney (1x1)
+      const newObs = {
+         id: Math.random().toString(36).substr(2, 9),
+         x: pos.x,
+         y: pos.y,
+         width: 1.0,
+         height: 1.0
+      };
+      addObstacle(newObs);
     } else if (activeTool === 'ADD_DRAIN') {
       addDrain({
         id: Math.random().toString(36).substr(2, 9),
@@ -210,16 +212,15 @@ export const Editor2D: React.FC = () => {
 
       </svg>
       
-      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-2 rounded-lg shadow-sm border border-gray-200 text-sm text-gray-600 pointer-events-none">
-        <div className="font-semibold text-gray-800 mb-1">
-          {activeTool === 'DRAW_ROOF' ? '✏️  Drawing Roof' : 
-           activeTool === 'ADD_OBSTACLE' ? '🧱 Adding Obstacle' :
-           activeTool === 'ADD_DRAIN' ? '💧 Adding Drain' : '👆 Selection Mode'}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow-lg text-sm font-medium text-gray-700 flex items-center gap-2">
+           <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+           {
+            activeTool === 'DRAW_ROOF' ? '✏️ Drawing Roof Mode' :
+            activeTool === 'DRAW_OBSTACLE' ? '🧱 Adding Obstacle' :
+            activeTool === 'ADD_DRAIN' ? '💧 Adding Drain' :
+            'Move mouse to explore'
+           }
         </div>
-        <div className="text-xs text-gray-500">
-           {activeTool === 'DRAW_ROOF' ? 'Click to add points.' : 'Click to place item.'}
-        </div>
-      </div>
     </div>
   );
 };
