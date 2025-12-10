@@ -46,6 +46,19 @@ export const Editor2D: React.FC = () => {
     }
   };
 
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 0) return;
+    const touch = e.touches[0];
+    const pos = toWorld(touch.clientX, touch.clientY);
+    setMousePos(pos);
+
+    if (activeTool === 'SELECT' && draggingPoint !== null) {
+        // Prevent scrolling while dragging
+        e.preventDefault(); 
+        updatePoint(draggingPoint, pos.x, pos.y);
+    }
+  };
+
   const handleMouseUp = () => {
       setDraggingPoint(null);
   };
@@ -83,6 +96,8 @@ export const Editor2D: React.FC = () => {
     }
   };
 
+
+
   // SVG grid pattern
   const GridPattern = () => (
     <pattern id="grid" width={SCALE} height={SCALE} patternUnits="userSpaceOnUse">
@@ -91,11 +106,17 @@ export const Editor2D: React.FC = () => {
   );
 
   return (
-    <div className="w-full h-full bg-gray-50 overflow-hidden relative" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
+    <div className="w-full h-full bg-gray-50 overflow-hidden relative" 
+        onMouseUp={handleMouseUp} 
+        onMouseLeave={handleMouseUp}
+        onTouchEnd={handleMouseUp}
+        onTouchCancel={handleMouseUp}
+    >
       <svg 
         ref={svgRef}
         className={`w-full h-full ${activeTool === 'SELECT' ? 'cursor-default' : 'cursor-crosshair'}`}
         onMouseMove={handleMouseMove}
+        onTouchMove={handleTouchMove}
         onClick={handleClick}
       >
         <defs>
@@ -131,6 +152,12 @@ export const Editor2D: React.FC = () => {
                   fill={draggingPoint === i ? "#db2777" : "#2563eb"} 
                   className={activeTool === 'SELECT' ? 'cursor-grab hover:fill-blue-400' : ''}
                   onMouseDown={(e) => {
+                     if (activeTool === 'SELECT') {
+                         e.stopPropagation();
+                         setDraggingPoint(i);
+                     }
+                  }}
+                  onTouchStart={(e) => {
                      if (activeTool === 'SELECT') {
                          e.stopPropagation();
                          setDraggingPoint(i);

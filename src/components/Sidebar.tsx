@@ -1,6 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useStore } from '../store';
-import { MousePointer2, PenTool, BoxSelect, Circle, Trash2, Upload, Download, DollarSign, Layers, Settings } from 'lucide-react';
+import { MousePointer2, PenTool, BoxSelect, Circle, Trash2, Upload, Download, DollarSign, Layers, Settings, FileText } from 'lucide-react';
+import { InvoiceModal } from './InvoiceModal';
+import jsPDF from 'jspdf';
 import { calculateEstimates } from '../utils/calculations';
 import Logo from '/android-chrome-512x512.png'
 export const Sidebar: React.FC = () => {
@@ -12,12 +14,15 @@ export const Sidebar: React.FC = () => {
     roofHeight, tileSize
   } = useStore();
 
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [generatedPdf, setGeneratedPdf] = useState<jsPDF | null>(null);
+
   const estimates = useMemo(() => {
     return calculateEstimates(points, obstacles, materialCostPerSqMeter, roofHeight, tileSize);
   }, [points, obstacles, materialCostPerSqMeter, roofHeight, tileSize]);
 
   return (
-    <div className="w-80 h-full bg-slate-900/95 backdrop-blur-xl border-r border-white/5 flex flex-col text-slate-300 overflow-y-auto shadow-2xl font-sans">
+    <div className="w-96 h-full bg-slate-900/95 backdrop-blur-xl border-r border-white/5 flex flex-col text-slate-300 overflow-y-auto shadow-2xl font-sans">
       {/* Header */}
       <div className="p-6 border-b border-white/5 bg-gradient-to-b from-white/5 to-transparent">
         <div className="flex items-center justify-between mb-1">
@@ -79,7 +84,25 @@ export const Sidebar: React.FC = () => {
                 onClick={reset}
                 danger
             />
+            <div className="w-px bg-white/10 my-1"></div>
+            <ActionButton 
+                icon={<FileText size={16} />} 
+                label="Invoice" 
+                onClick={() => {
+                    import('../utils/pdfGenerator').then(mod => {
+                        const doc = mod.generateInvoice(useStore.getState());
+                        setGeneratedPdf(doc);
+                        setShowInvoiceModal(true);
+                    });
+                }}
+            />
         </div>
+
+        <InvoiceModal 
+            isOpen={showInvoiceModal} 
+            onClose={() => setShowInvoiceModal(false)} 
+            pdfDoc={generatedPdf} 
+        />
 
         {/* View Mode Toggle */}
         <div>
